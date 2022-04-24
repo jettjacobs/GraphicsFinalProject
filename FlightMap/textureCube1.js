@@ -2,18 +2,16 @@
 
 var canvas;
 var gl;
+var program;
 
 var numVertices  = 16;
+var texSize = 64; 
 
-var texSize = 64;
-
+// Perspective Projection Components
 var near = 0.3;
 var far = 3.0;
-var  fovy = 30.0;  // Field-of-view in Y direction angle (in degrees)
-var  aspect = 1.0;       // Viewport aspect ratio
-
-
-var program;
+var  fovy = 30.0;
+var  aspect = 1.0;
 
 var pointsArray = [];
 var colorsArray = [];
@@ -29,6 +27,7 @@ var texCoord = [
 ];
 
 var vertices = [
+    // US or World Map (STATIC)
     vec4( -0.5, -0.5,  0.0, 1.0 ),
     vec4( -0.5,  0.5,  0.0, 1.0 ),
     vec4( 0.5,  0.5,  0.0, 1.0 ),
@@ -38,6 +37,7 @@ var vertices = [
     vec4( 0.5,  0.5, -0.5, 1.0 ),
     vec4( 0.5, -0.5, -0.5, 1.0 ),
 
+    // Airplane Icon (DYNAMIC)
     vec4( -0.2, -0.2,  0.2, 1.0 ),
     vec4( -0.2,  0.2,  0.2, 1.0 ),
     vec4( 0.2,  0.2,  0.2, 1.0 ),
@@ -54,11 +54,13 @@ var eye = vec3(0.0, 0.0, 3.0);
 var at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 
-var white = vec4( 1.0, 1.0, 1.0, 1.0 );  // white
+// For cube background coloring
+var white = vec4( 1.0, 1.0, 1.0, 1.0 );
 
+// Currently unused
 var theta = [0.0, 0.0, 0.0];
-
 var thetaLoc;
+
 
 function configureTexture( image ) {
     texture = gl.createTexture();
@@ -70,7 +72,6 @@ function configureTexture( image ) {
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                       gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 }
 
@@ -102,8 +103,9 @@ function quad(a, b, c, d) {
      texCoordsArray.push(texCoord[3]);
 }
 
-function colorCube()
+function textureCubes()
 {   
+    // US or World Map
     quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
     quad( 3, 0, 4, 7 );
@@ -111,6 +113,7 @@ function colorCube()
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
 
+    // Airplane Icon
     quad( 9, 8, 11, 10 );
     quad( 10, 11, 15, 14 );
     quad( 11, 8, 12, 15 );
@@ -132,13 +135,11 @@ window.onload = function init() {
 
     gl.enable(gl.DEPTH_TEST);
 
-    //
     //  Load shaders and initialize attribute buffers
-    //
     program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    colorCube();
+    textureCubes();
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
